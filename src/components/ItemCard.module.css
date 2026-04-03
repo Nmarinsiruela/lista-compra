@@ -1,0 +1,74 @@
+.card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  transition: opacity 0.3s, border-color 0.2s;
+}
+
+.card.done {
+  opacity: 0.55;
+  border-color: var(--gray-border);
+}
+
+.checkBtn {
+  width: 56px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2.5px solid var(--gray-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.card.done .circle {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.name {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 14px 0;
+  transition: color 0.2s;
+}
+
+.card.done .name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.deleteBtn {
+  width: 48px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #d1d5db;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.deleteBtn:active {
+  color: #dc2626;
+}

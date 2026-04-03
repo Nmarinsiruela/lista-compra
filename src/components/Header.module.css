@@ -1,0 +1,122 @@
+.header {
+  background: var(--green);
+  color: white;
+  padding: 16px 16px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.stats {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.clearBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.clearBtn:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.clearAllBtn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.clearAllBtn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.inputArea {
+  position: relative;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 6px 6px 6px 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.inputWrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.addBtn {
+  background: white;
+  border: none;
+  color: var(--green);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.addBtn:active {
+  transform: scale(0.93);
+}
