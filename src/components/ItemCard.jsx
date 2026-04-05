@@ -32,7 +32,7 @@ export function ItemCard({ item, onToggle, onDelete }) {
         </div>
       </button>
 
-      <span className={styles.name}>{item.name}</span>
+      <span className={styles.name} onClick={() => onToggle(item.id)}>{item.name}</span>
 
       <button
         className={styles.deleteBtn}

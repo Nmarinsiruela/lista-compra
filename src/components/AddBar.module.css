@@ -1,0 +1,64 @@
+.bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--green);
+  padding: 10px 16px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 6px 6px 6px 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.inputWrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.addBtn {
+  background: white;
+  border: none;
+  color: var(--green);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.addBtn:active {
+  transform: scale(0.93);
+}

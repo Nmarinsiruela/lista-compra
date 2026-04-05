@@ -1,12 +1,13 @@
 import { useCallback } from 'react'
 import { Header } from './components/Header'
 import { ItemList } from './components/ItemList'
+import { AddBar } from './components/AddBar'
 import { Toast, useToast } from './components/Toast'
 import { useShoppingList } from './hooks/useShoppingList'
 import styles from './App.module.css'
 
 export default function App() {
-  const { pending, done, pendingNames, addItem, toggleItem, deleteItem, clearDone, clearAll, emptyCart, getSuggestions } =
+  const { pending, done, pendingNames, addItem, toggleItem, deleteItem, clearAll, emptyCart, getSuggestions } =
     useShoppingList()
   const { message, visible, showToast } = useToast()
 
@@ -17,15 +18,6 @@ export default function App() {
     },
     [addItem, showToast],
   )
-
-  const handleClearDone = useCallback(() => {
-    const result = clearDone()
-    if (result.count === 0) {
-      showToast('No hay productos marcados')
-    } else {
-      showToast(`${result.count} producto${result.count > 1 ? 's' : ''} eliminado${result.count > 1 ? 's' : ''}`)
-    }
-  }, [clearDone, showToast])
 
   const handleEmptyCart = useCallback(() => {
     const result = emptyCart()
@@ -50,11 +42,8 @@ export default function App() {
       <Header
         pending={pending}
         done={done}
-        pendingNames={pendingNames}
-        onAdd={handleAdd}
         onEmptyCart={handleEmptyCart}
         onClearAll={handleClearAll}
-        getSuggestions={getSuggestions}
       />
 
       <main className={styles.main}>
@@ -65,6 +54,12 @@ export default function App() {
           onDelete={deleteItem}
         />
       </main>
+
+      <AddBar
+        onAdd={handleAdd}
+        getSuggestions={getSuggestions}
+        pendingNames={pendingNames}
+      />
 
       <Toast message={message} visible={visible} />
     </>
