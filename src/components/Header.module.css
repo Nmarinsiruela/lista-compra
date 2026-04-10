@@ -66,3 +66,21 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+.shareBtn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.shareBtn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+

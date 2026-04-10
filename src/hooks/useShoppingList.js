@@ -97,6 +97,21 @@ export function useShoppingList() {
     return { count: doneCount }
   }, [list, updateList])
 
+  const importItems = useCallback((names) => {
+    const existingNorms = new Set(list.map((i) => normalize(i.name)))
+    const toAdd = []
+    for (const rawName of names) {
+      const name = rawName?.trim()
+      if (!name) continue
+      const norm = normalize(name)
+      if (existingNorms.has(norm)) continue
+      existingNorms.add(norm)
+      toAdd.push({ id: uid(), name: capitalize(name), done: false, addedAt: Date.now() })
+    }
+    if (toAdd.length > 0) updateList((prev) => [...toAdd, ...prev])
+    return { added: toAdd.length }
+  }, [list, updateList])
+
   const clearAll = useCallback(() => {
     const total = list.length
     if (!total) return { count: 0 }
@@ -119,6 +134,7 @@ export function useShoppingList() {
     clearDone,
     clearAll,
     emptyCart,
+    importItems,
     getSuggestions,
   }
 }
