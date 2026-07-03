@@ -22,7 +22,9 @@ function capitalize(str) {
 
 function loadList() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []
+    // Migrate items saved before tags existed.
+    return raw.map((i) => (Array.isArray(i.tags) ? i : { ...i, tags: [] }))
   } catch {
     return []
   }
@@ -45,7 +47,7 @@ export function useShoppingList() {
   }, [])
 
   const addItem = useCallback(
-    (rawName) => {
+    (rawName, tags = []) => {
       const name = rawName.trim()
       if (!name) return { ok: false, message: '' }
 
@@ -55,12 +57,45 @@ export function useShoppingList() {
         return { ok: false, message: `"${existing.name}" ya está en la lista` }
       }
 
-      const item = { id: uid(), name: capitalize(name), done: false, addedAt: Date.now() }
+      const item = {
+        id: uid(),
+        name: capitalize(name),
+        done: false,
+        addedAt: Date.now(),
+        tags: [...new Set(tags)],
+      }
       updateList((prev) => [item, ...prev])
       addToHistory(name)
       return { ok: true, message: `"${item.name}" añadido` }
     },
     [list, updateList, addToHistory],
+  )
+
+  const toggleItemTag = useCallback(
+    (id, tagKey) => {
+      updateList((prev) =>
+        prev.map((item) => {
+          if (item.id !== id) return item
+          const has = item.tags.includes(tagKey)
+          return {
+            ...item,
+            tags: has ? item.tags.filter((t) => t !== tagKey) : [...item.tags, tagKey],
+          }
+        }),
+      )
+    },
+    [updateList],
+  )
+
+  const purgeTag = useCallback(
+    (tagKey) => {
+      updateList((prev) =>
+        prev.map((item) =>
+          item.tags.includes(tagKey) ? { ...item, tags: item.tags.filter((t) => t !== tagKey) } : item,
+        ),
+      )
+    },
+    [updateList],
   )
 
   const toggleItem = useCallback(
@@ -106,7 +141,7 @@ export function useShoppingList() {
       const norm = normalize(name)
       if (existingNorms.has(norm)) continue
       existingNorms.add(norm)
-      toAdd.push({ id: uid(), name: capitalize(name), done: false, addedAt: Date.now() })
+      toAdd.push({ id: uid(), name: capitalize(name), done: false, addedAt: Date.now(), tags: [] })
     }
     if (toAdd.length > 0) updateList((prev) => [...toAdd, ...prev])
     return { added: toAdd.length }
@@ -130,6 +165,8 @@ export function useShoppingList() {
     pendingNames,
     addItem,
     toggleItem,
+    toggleItemTag,
+    purgeTag,
     deleteItem,
     clearDone,
     clearAll,

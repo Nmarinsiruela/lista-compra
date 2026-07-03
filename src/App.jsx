@@ -4,11 +4,13 @@ import { ItemList } from './components/ItemList'
 import { AddBar } from './components/AddBar'
 import { Toast, useToast } from './components/Toast'
 import { useShoppingList } from './hooks/useShoppingList'
+import { useTags } from './hooks/useTags'
 import styles from './App.module.css'
 
 export default function App() {
-  const { pending, done, pendingNames, addItem, toggleItem, deleteItem, clearAll, emptyCart, importItems, getSuggestions } =
+  const { pending, done, pendingNames, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, getSuggestions } =
     useShoppingList()
+  const { allTags, ensureTag, getTag } = useTags()
   const { message, visible, showToast } = useToast()
   const didImport = useRef(false)
 
@@ -38,8 +40,8 @@ export default function App() {
   }, [importItems, showToast])
 
   const handleAdd = useCallback(
-    (name) => {
-      const result = addItem(name)
+    (name, tags) => {
+      const result = addItem(name, tags)
       if (result.message) showToast(result.message)
     },
     [addItem, showToast],
@@ -97,6 +99,10 @@ export default function App() {
           done={done}
           onToggle={toggleItem}
           onDelete={deleteItem}
+          allTags={allTags}
+          getTag={getTag}
+          onToggleItemTag={toggleItemTag}
+          ensureTag={ensureTag}
         />
       </main>
 
@@ -104,6 +110,8 @@ export default function App() {
         onAdd={handleAdd}
         getSuggestions={getSuggestions}
         pendingNames={pendingNames}
+        allTags={allTags}
+        ensureTag={ensureTag}
       />
 
       <Toast message={message} visible={visible} />

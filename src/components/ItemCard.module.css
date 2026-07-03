@@ -3,11 +3,14 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-bottom: 6px;
-  display: flex;
-  align-items: center;
   overflow: hidden;
   border: 1.5px solid transparent;
   transition: opacity 0.3s, border-color 0.2s;
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
 }
 
 .card.done {
@@ -43,19 +46,54 @@
   border-color: var(--green);
 }
 
-.name {
+.body {
   flex: 1;
-  font-size: 0.95rem;
-  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
   padding: 10px 0;
-  transition: color 0.2s;
   cursor: pointer;
   user-select: none;
+  min-width: 0;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .card.done .name {
   text-decoration: line-through;
   color: var(--text-muted);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tagBtn {
+  width: 40px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #cbd1d9;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.tagBtnActive {
+  color: var(--green);
+}
+
+.editor {
+  padding: 2px 14px 12px 48px;
 }
 
 .deleteBtn {

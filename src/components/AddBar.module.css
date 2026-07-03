@@ -12,6 +12,12 @@
   z-index: 10;
 }
 
+.tagRow {
+  margin-bottom: 8px;
+  max-height: 88px;
+  overflow-y: auto;
+}
+
 .inputWrapper {
   display: flex;
   gap: 8px;

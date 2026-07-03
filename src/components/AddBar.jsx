@@ -1,10 +1,12 @@
 import { useState, useRef, useCallback } from 'react'
 import { Autocomplete } from './Autocomplete'
+import { TagPicker } from './TagPicker'
 import styles from './AddBar.module.css'
 
-export function AddBar({ onAdd, getSuggestions, pendingNames }) {
+export function AddBar({ onAdd, getSuggestions, pendingNames, allTags, ensureTag }) {
   const [value, setValue] = useState('')
   const [suggestions, setSuggestions] = useState([])
+  const [activeTags, setActiveTags] = useState([])
   const inputRef = useRef(null)
 
   const handleChange = useCallback((e) => {
@@ -15,21 +17,21 @@ export function AddBar({ onAdd, getSuggestions, pendingNames }) {
 
   const submit = useCallback(() => {
     if (!value.trim()) return
-    onAdd(value)
+    onAdd(value, activeTags)
     setValue('')
     setSuggestions([])
-  }, [value, onAdd])
+  }, [value, onAdd, activeTags])
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') submit()
   }, [submit])
 
   const handleSelect = useCallback((name) => {
-    onAdd(name)
+    onAdd(name, activeTags)
     setValue('')
     setSuggestions([])
     inputRef.current?.focus()
-  }, [onAdd])
+  }, [onAdd, activeTags])
 
   const handleBlur = useCallback(() => {
     setTimeout(() => setSuggestions([]), 150)
@@ -39,9 +41,26 @@ export function AddBar({ onAdd, getSuggestions, pendingNames }) {
     if (value.trim()) setSuggestions(getSuggestions(value, pendingNames))
   }, [value, getSuggestions, pendingNames])
 
+  const toggleActive = useCallback((key) => {
+    setActiveTags((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
+  }, [])
+
+  const handleCreate = useCallback((name) => {
+    const key = ensureTag(name)
+    if (key) setActiveTags((prev) => (prev.includes(key) ? prev : [...prev, key]))
+  }, [ensureTag])
+
   return (
     <div className={styles.bar}>
       <Autocomplete suggestions={suggestions} onSelect={handleSelect} />
+      <div className={styles.tagRow}>
+        <TagPicker
+          allTags={allTags}
+          selected={activeTags}
+          onToggle={toggleActive}
+          onCreate={handleCreate}
+        />
+      </div>
       <div className={styles.inputWrapper}>
         <input
           ref={inputRef}

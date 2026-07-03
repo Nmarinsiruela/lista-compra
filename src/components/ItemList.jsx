@@ -11,8 +11,10 @@ function EmptyState() {
   )
 }
 
-export function ItemList({ pending, done, onToggle, onDelete }) {
+export function ItemList({ pending, done, onToggle, onDelete, allTags, getTag, onToggleItemTag, ensureTag }) {
   if (!pending.length && !done.length) return <EmptyState />
+
+  const cardProps = { onToggle, onDelete, allTags, getTag, onToggleItemTag, ensureTag }
 
   return (
     <div className={styles.container}>
@@ -20,7 +22,7 @@ export function ItemList({ pending, done, onToggle, onDelete }) {
         <section>
           <h2 className={styles.sectionLabel}>Por comprar ({pending.length})</h2>
           {pending.map((item) => (
-            <ItemCard key={item.id} item={item} onToggle={onToggle} onDelete={onDelete} />
+            <ItemCard key={item.id} item={item} {...cardProps} />
           ))}
         </section>
       )}
@@ -29,7 +31,7 @@ export function ItemList({ pending, done, onToggle, onDelete }) {
         <section className={styles.doneSection}>
           <h2 className={styles.sectionLabel}>En el carro ({done.length})</h2>
           {done.map((item) => (
-            <ItemCard key={item.id} item={item} onToggle={onToggle} onDelete={onDelete} />
+            <ItemCard key={item.id} item={item} {...cardProps} />
           ))}
         </section>
       )}
