@@ -36,6 +36,17 @@ export function useHistory() {
     })
   }, [])
 
+  const removeFromHistory = useCallback((name) => {
+    const key = normalize(name)
+    setHistory((prev) => {
+      if (!prev[key]) return prev
+      const updated = { ...prev }
+      delete updated[key]
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      return updated
+    })
+  }, [])
+
   const getSuggestions = useCallback(
     (query, pendingNames) => {
       const q = normalize(query)
@@ -57,5 +68,5 @@ export function useHistory() {
     [history],
   )
 
-  return { addToHistory, getSuggestions }
+  return { addToHistory, removeFromHistory, getSuggestions }
 }

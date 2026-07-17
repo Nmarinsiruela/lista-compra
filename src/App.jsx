@@ -8,7 +8,7 @@ import { useTags } from './hooks/useTags'
 import styles from './App.module.css'
 
 export default function App() {
-  const { pending, done, pendingNames, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, getSuggestions } =
+  const { pending, done, pendingNames, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, getSuggestions, removeFromHistory } =
     useShoppingList()
   const { allTags, ensureTag, getTag } = useTags()
   const { message, visible, showToast } = useToast()
@@ -109,6 +109,7 @@ export default function App() {
       <AddBar
         onAdd={handleAdd}
         getSuggestions={getSuggestions}
+        removeFromHistory={removeFromHistory}
         pendingNames={pendingNames}
         allTags={allTags}
         ensureTag={ensureTag}

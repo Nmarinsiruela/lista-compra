@@ -36,7 +36,7 @@ function persistList(list) {
 
 export function useShoppingList() {
   const [list, setList] = useState(loadList)
-  const { addToHistory, getSuggestions } = useHistory()
+  const { addToHistory, removeFromHistory, getSuggestions } = useHistory()
 
   const updateList = useCallback((updater) => {
     setList((prev) => {
@@ -173,5 +173,6 @@ export function useShoppingList() {
     emptyCart,
     importItems,
     getSuggestions,
+    removeFromHistory,
   }
 }

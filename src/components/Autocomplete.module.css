@@ -49,3 +49,23 @@
   border-radius: 20px;
   white-space: nowrap;
 }
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px -6px -6px 0;
+  background: none;
+  border: none;
+  color: #cbd1d9;
+  flex-shrink: 0;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.deleteBtn:active {
+  color: #dc2626;
+  background: var(--gray-light);
+}

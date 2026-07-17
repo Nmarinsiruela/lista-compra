@@ -3,7 +3,7 @@ import { Autocomplete } from './Autocomplete'
 import { TagPicker } from './TagPicker'
 import styles from './AddBar.module.css'
 
-export function AddBar({ onAdd, getSuggestions, pendingNames, allTags, ensureTag }) {
+export function AddBar({ onAdd, getSuggestions, removeFromHistory, pendingNames, allTags, ensureTag }) {
   const [value, setValue] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [activeTags, setActiveTags] = useState([])
@@ -33,6 +33,12 @@ export function AddBar({ onAdd, getSuggestions, pendingNames, allTags, ensureTag
     inputRef.current?.focus()
   }, [onAdd, activeTags])
 
+  const handleDeleteSuggestion = useCallback((name) => {
+    removeFromHistory(name)
+    setSuggestions((prev) => prev.filter((s) => s.name !== name))
+    inputRef.current?.focus()
+  }, [removeFromHistory])
+
   const handleBlur = useCallback(() => {
     setTimeout(() => setSuggestions([]), 150)
   }, [])
@@ -52,7 +58,7 @@ export function AddBar({ onAdd, getSuggestions, pendingNames, allTags, ensureTag
 
   return (
     <div className={styles.bar}>
-      <Autocomplete suggestions={suggestions} onSelect={handleSelect} />
+      <Autocomplete suggestions={suggestions} onSelect={handleSelect} onDelete={handleDeleteSuggestion} />
       <div className={styles.tagRow}>
         <TagPicker
           allTags={allTags}

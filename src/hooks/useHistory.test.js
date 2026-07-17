@@ -28,6 +28,20 @@ describe('useHistory', () => {
     expect(result.current.getSuggestions('', [])).toEqual([])
   })
 
+  it('removes an entry from the history (accent/case insensitive)', () => {
+    const { result } = renderHook(() => useHistory())
+
+    act(() => {
+      result.current.addToHistory('Plátano')
+    })
+    act(() => {
+      result.current.removeFromHistory('platano')
+    })
+
+    expect(result.current.getSuggestions('pla', [])).toEqual([])
+    expect(localStorage.getItem('compra_historial')).toBe('{}')
+  })
+
   it('excludes names already pending', () => {
     const { result } = renderHook(() => useHistory())
 
