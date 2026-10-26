@@ -1,39 +1,20 @@
-import { useState, useCallback } from 'react'
-
-const STORAGE_KEY = 'compra_historial'
-
-function normalize(str) {
-  return str
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-}
-
-function loadHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
-  } catch {
-    return {}
-  }
-}
+import { useState, useEffect, useCallback } from 'react'
+import { normalize, capitalize } from '../utils/text'
+import { STORAGE_KEYS, loadJSON, saveJSON } from '../utils/storage'
 
 export function useHistory() {
-  const [history, setHistory] = useState(loadHistory)
+  const [history, setHistory] = useState(() => loadJSON(STORAGE_KEYS.history, {}))
+
+  useEffect(() => saveJSON(STORAGE_KEYS.history, history), [history])
 
   const addToHistory = useCallback((name) => {
     const key = normalize(name)
-    const display = name.trim().charAt(0).toUpperCase() + name.trim().slice(1).toLowerCase()
+    const display = capitalize(name)
 
-    setHistory((prev) => {
-      const entry = prev[key] || { name: display, count: 0, lastAdded: 0 }
-      const updated = {
-        ...prev,
-        [key]: { name: display, count: entry.count + 1, lastAdded: Date.now() },
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
-      return updated
-    })
+    setHistory((prev) => ({
+      ...prev,
+      [key]: { name: display, count: (prev[key]?.count ?? 0) + 1, lastAdded: Date.now() },
+    }))
   }, [])
 
   const removeFromHistory = useCallback((name) => {
@@ -42,7 +23,6 @@ export function useHistory() {
       if (!prev[key]) return prev
       const updated = { ...prev }
       delete updated[key]
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
       return updated
     })
   }, [])

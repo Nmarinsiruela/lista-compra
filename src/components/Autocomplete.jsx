@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/I18nContext'
 import styles from './Autocomplete.module.css'
 
 function TrashIcon() {
@@ -12,6 +13,7 @@ function TrashIcon() {
 }
 
 export function Autocomplete({ suggestions, onSelect, onDelete }) {
+  const { t } = useI18n()
   if (!suggestions.length) return null
 
   return (
@@ -31,7 +33,7 @@ export function Autocomplete({ suggestions, onSelect, onDelete }) {
           <span className={styles.freq}>{s.count}×</span>
           <button
             className={styles.deleteBtn}
-            aria-label={`Eliminar "${s.name}" del historial`}
+            aria-label={t('autocomplete.removeFromHistory', { name: s.name })}
             onPointerDown={(e) => {
               e.preventDefault()
               e.stopPropagation()

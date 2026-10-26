@@ -6,15 +6,18 @@
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1;
   padding: 6px 11px;
   border-radius: 20px;
   white-space: nowrap;
-  color: var(--tag-color);
-  background: color-mix(in srgb, var(--tag-color) 12%, white);
-  border: 1.5px solid color-mix(in srgb, var(--tag-color) 26%, white);
+  color: color-mix(in srgb, var(--tag-color), var(--text) var(--tag-ink-shift));
+  background: color-mix(in srgb, var(--tag-color) 12%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--tag-color) 26%, var(--surface));
   transition: transform 0.1s, background 0.15s, border-color 0.15s;
 }
 
@@ -22,42 +25,13 @@
   transform: scale(0.94);
 }
 
+.chip:focus-visible {
+  outline: 2px solid var(--tag-color);
+  outline-offset: 2px;
+}
+
 .chip.on {
   color: white;
   background: var(--tag-color);
   border-color: var(--tag-color);
-}
-
-.addChip {
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 6px 11px;
-  border-radius: 20px;
-  white-space: nowrap;
-  color: var(--text-muted);
-  background: var(--gray-light);
-  border: 1.5px dashed var(--gray-border);
-  transition: transform 0.1s;
-}
-
-.addChip:active {
-  transform: scale(0.94);
-}
-
-.input {
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 20px;
-  border: 1.5px solid var(--gray-border);
-  outline: none;
-  width: 130px;
-  background: white;
-  color: var(--text);
-  font-family: inherit;
-}
-
-.input:focus {
-  border-color: var(--green);
 }

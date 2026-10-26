@@ -1,5 +1,5 @@
 .card {
-  background: white;
+  background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-bottom: 6px;
@@ -83,7 +83,7 @@
   justify-content: center;
   background: none;
   border: none;
-  color: #cbd1d9;
+  color: var(--icon-muted);
   flex-shrink: 0;
   transition: color 0.15s;
 }
@@ -104,11 +104,11 @@
   justify-content: center;
   background: none;
   border: none;
-  color: #d1d5db;
+  color: var(--icon-muted);
   flex-shrink: 0;
   transition: color 0.15s;
 }
 
 .deleteBtn:active {
-  color: #dc2626;
+  color: var(--danger);
 }

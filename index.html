@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#16a34a" />
+    <meta name="theme-color" content="#17482c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="description" content="Lista de la compra con historial inteligente" />
     <title>Lista de la Compra</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash; dark is the default.
+      try {
+        var theme = JSON.parse(localStorage.getItem('compra_tema'))
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

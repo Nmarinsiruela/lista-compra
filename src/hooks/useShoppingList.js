@@ -1,162 +1,111 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHistory } from './useHistory'
-
-const STORAGE_KEY = 'compra_lista'
+import { normalize, capitalize } from '../utils/text'
+import { STORAGE_KEYS, loadJSON, saveJSON } from '../utils/storage'
+import { migrateTags } from '../utils/tags'
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
-function normalize(str) {
-  return str
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-}
-
-function capitalize(str) {
-  const s = str.trim()
-  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
+function createItem(name, tags = []) {
+  return { id: uid(), name: capitalize(name), done: false, addedAt: Date.now(), tags: [...new Set(tags)] }
 }
 
 function loadList() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []
-    // Migrate items saved before tags existed.
-    return raw.map((i) => (Array.isArray(i.tags) ? i : { ...i, tags: [] }))
-  } catch {
-    return []
-  }
-}
-
-function persistList(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+  // Migrate items saved before tags existed, or with free-text tags from earlier versions.
+  return loadJSON(STORAGE_KEYS.list, []).map((i) => ({ ...i, tags: Array.isArray(i.tags) ? migrateTags(i.tags) : [] }))
 }
 
 export function useShoppingList() {
   const [list, setList] = useState(loadList)
   const { addToHistory, removeFromHistory, getSuggestions } = useHistory()
 
-  const updateList = useCallback((updater) => {
-    setList((prev) => {
-      const next = typeof updater === 'function' ? updater(prev) : updater
-      persistList(next)
-      return next
-    })
-  }, [])
+  useEffect(() => saveJSON(STORAGE_KEYS.list, list), [list])
 
+  // Returns a status instead of a message so the UI can word it in the active language.
   const addItem = useCallback(
     (rawName, tags = []) => {
       const name = rawName.trim()
-      if (!name) return { ok: false, message: '' }
+      if (!name) return { ok: false, status: 'empty' }
 
       const norm = normalize(name)
       const existing = list.find((i) => normalize(i.name) === norm && !i.done)
-      if (existing) {
-        return { ok: false, message: `"${existing.name}" ya está en la lista` }
-      }
+      if (existing) return { ok: false, status: 'duplicate', name: existing.name }
 
-      const item = {
-        id: uid(),
-        name: capitalize(name),
-        done: false,
-        addedAt: Date.now(),
-        tags: [...new Set(tags)],
-      }
-      updateList((prev) => [item, ...prev])
+      const item = createItem(name, tags)
+      setList((prev) => [item, ...prev])
       addToHistory(name)
-      return { ok: true, message: `"${item.name}" añadido` }
+      return { ok: true, status: 'added', name: item.name }
     },
-    [list, updateList, addToHistory],
+    [list, addToHistory],
   )
 
-  const toggleItemTag = useCallback(
-    (id, tagKey) => {
-      updateList((prev) =>
-        prev.map((item) => {
-          if (item.id !== id) return item
-          const has = item.tags.includes(tagKey)
-          return {
-            ...item,
-            tags: has ? item.tags.filter((t) => t !== tagKey) : [...item.tags, tagKey],
-          }
-        }),
-      )
-    },
-    [updateList],
-  )
-
-  const purgeTag = useCallback(
-    (tagKey) => {
-      updateList((prev) =>
-        prev.map((item) =>
-          item.tags.includes(tagKey) ? { ...item, tags: item.tags.filter((t) => t !== tagKey) } : item,
-        ),
-      )
-    },
-    [updateList],
-  )
+  const toggleItemTag = useCallback((id, tagKey) => {
+    setList((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item
+        const has = item.tags.includes(tagKey)
+        return {
+          ...item,
+          tags: has ? item.tags.filter((t) => t !== tagKey) : [...item.tags, tagKey],
+        }
+      }),
+    )
+  }, [])
 
   const toggleItem = useCallback(
     (id) => {
-      updateList((prev) =>
-        prev.map((item) => {
-          if (item.id !== id) return item
-          if (!item.done) addToHistory(item.name) // reinforce on check-off
-          return { ...item, done: !item.done }
-        }),
-      )
+      const item = list.find((i) => i.id === id)
+      if (!item) return
+      if (!item.done) addToHistory(item.name) // reinforce on check-off
+      setList((prev) => prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i)))
     },
-    [updateList, addToHistory],
+    [list, addToHistory],
   )
 
-  const deleteItem = useCallback(
-    (id) => {
-      updateList((prev) => prev.filter((i) => i.id !== id))
-    },
-    [updateList],
-  )
-
-  const clearDone = useCallback(() => {
-    const doneCount = list.filter((i) => i.done).length
-    if (!doneCount) return { count: 0 }
-    updateList((prev) => prev.filter((i) => !i.done))
-    return { count: doneCount }
-  }, [list, updateList])
+  const deleteItem = useCallback((id) => {
+    setList((prev) => prev.filter((i) => i.id !== id))
+  }, [])
 
   const emptyCart = useCallback(() => {
     const doneCount = list.filter((i) => i.done).length
-    if (!doneCount) return { count: 0 }
-    updateList((prev) => prev.map((i) => (i.done ? { ...i, done: false } : i)))
+    if (doneCount) setList((prev) => prev.map((i) => (i.done ? { ...i, done: false } : i)))
     return { count: doneCount }
-  }, [list, updateList])
+  }, [list])
 
-  const importItems = useCallback((names) => {
-    const existingNorms = new Set(list.map((i) => normalize(i.name)))
-    const toAdd = []
-    for (const rawName of names) {
-      const name = rawName?.trim()
-      if (!name) continue
-      const norm = normalize(name)
-      if (existingNorms.has(norm)) continue
-      existingNorms.add(norm)
-      toAdd.push({ id: uid(), name: capitalize(name), done: false, addedAt: Date.now(), tags: [] })
-    }
-    if (toAdd.length > 0) updateList((prev) => [...toAdd, ...prev])
-    return { added: toAdd.length }
-  }, [list, updateList])
+  const importItems = useCallback(
+    (names, tags = []) => {
+      const existingNorms = new Set(list.map((i) => normalize(i.name)))
+      const toAdd = []
+      for (const rawName of names) {
+        const name = rawName?.trim()
+        if (!name) continue
+        const norm = normalize(name)
+        if (existingNorms.has(norm)) continue
+        existingNorms.add(norm)
+        toAdd.push(createItem(name, tags))
+      }
+      if (toAdd.length > 0) setList((prev) => [...toAdd, ...prev])
+      return { added: toAdd.length }
+    },
+    [list],
+  )
 
   const clearAll = useCallback(() => {
     const total = list.length
-    if (!total) return { count: 0 }
-    updateList([])
+    if (total) setList([])
     return { count: total }
-  }, [list, updateList])
+  }, [list])
 
-  const pendingNames = list.filter((i) => !i.done).map((i) => i.name)
-  const pending = list.filter((i) => !i.done)
-  const done = list.filter((i) => i.done)
+  const { pending, done, pendingNames } = useMemo(() => {
+    const pending = list.filter((i) => !i.done)
+    return {
+      pending,
+      done: list.filter((i) => i.done),
+      pendingNames: pending.map((i) => i.name),
+    }
+  }, [list])
 
   return {
     list,
@@ -166,9 +115,7 @@ export function useShoppingList() {
     addItem,
     toggleItem,
     toggleItemTag,
-    purgeTag,
     deleteItem,
-    clearDone,
     clearAll,
     emptyCart,
     importItems,

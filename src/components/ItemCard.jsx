@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TagBadge } from './TagBadge'
 import { TagPicker } from './TagPicker'
+import { useI18n } from '../i18n/I18nContext'
 import styles from './ItemCard.module.css'
 
 function CheckIcon() {
@@ -31,14 +32,10 @@ function TagIcon() {
   )
 }
 
-export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleItemTag, ensureTag }) {
+export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleItemTag }) {
   const [editing, setEditing] = useState(false)
-  const badges = item.tags.map((key) => getTag(key)).filter(Boolean)
-
-  const handleCreate = (name) => {
-    const key = ensureTag(name)
-    if (key) onToggleItemTag(item.id, key)
-  }
+  const { t } = useI18n()
+  const badges = item.tags.map(getTag).filter(Boolean)
 
   return (
     <div className={`${styles.card} ${item.done ? styles.done : ''}`}>
@@ -46,7 +43,7 @@ export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleIt
         <button
           className={styles.checkBtn}
           onClick={() => onToggle(item.id)}
-          aria-label={item.done ? 'Desmarcar' : 'Marcar como recogido'}
+          aria-label={item.done ? t('item.uncheck') : t('item.check')}
         >
           <div className={styles.circle}>
             {item.done && <CheckIcon />}
@@ -67,7 +64,7 @@ export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleIt
         <button
           className={`${styles.tagBtn} ${editing ? styles.tagBtnActive : ''}`}
           onClick={() => setEditing((v) => !v)}
-          aria-label="Editar etiquetas"
+          aria-label={t('item.editTags')}
           aria-expanded={editing}
         >
           <TagIcon />
@@ -76,7 +73,7 @@ export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleIt
         <button
           className={styles.deleteBtn}
           onClick={() => onDelete(item.id)}
-          aria-label="Eliminar"
+          aria-label={t('item.delete')}
         >
           <TrashIcon />
         </button>
@@ -88,7 +85,6 @@ export function ItemCard({ item, onToggle, onDelete, allTags, getTag, onToggleIt
             allTags={allTags}
             selected={item.tags}
             onToggle={(key) => onToggleItemTag(item.id, key)}
-            onCreate={handleCreate}
           />
         </div>
       )}

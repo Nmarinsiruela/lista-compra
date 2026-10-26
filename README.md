@@ -5,10 +5,25 @@ Webapp mobile-first para gestionar la lista de la compra, con historial intelige
 ## Características
 
 - Añadir, marcar y eliminar productos
-- Etiquetas ("carros") por producto para separar la compra (p. ej. familia vs. propia)
+- Etiquetas por producto para separar la compra: *Yo*, *Familia*, *Amigos*, *Otros* (un producto puede tener varias)
 - Autocompletado basado en historial personal (ordenado por frecuencia)
 - Persistencia en `localStorage` — funciona sin conexión
+- Compartir la lista mediante enlace; los productos importados reciben la etiqueta *Externo*
+- Interfaz en español e inglés (selector ES/EN en la cabecera)
+- Modo oscuro por defecto, con opción de modo claro
 - Diseño mobile-first
+
+## Estructura
+
+```
+src/
+  components/   Componentes de UI (+ CSS modules)
+  hooks/        Estado: lista, historial, etiquetas, tema, toasts
+  i18n/         Traducciones (translations.js) y proveedor de idioma
+  utils/        Helpers: texto, localStorage, enlaces compartidos, etiquetas del sistema
+```
+
+Para añadir un idioma, añade un diccionario en `src/i18n/translations.js` con las mismas claves (un test comprueba que coinciden).
 
 ## Desarrollo
 

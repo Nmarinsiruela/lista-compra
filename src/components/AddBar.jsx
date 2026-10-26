@@ -1,13 +1,17 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { Autocomplete } from './Autocomplete'
 import { TagPicker } from './TagPicker'
+import { useI18n } from '../i18n/I18nContext'
 import styles from './AddBar.module.css'
 
-export function AddBar({ onAdd, getSuggestions, removeFromHistory, pendingNames, allTags, ensureTag }) {
+export function AddBar({ onAdd, getSuggestions, removeFromHistory, pendingNames, allTags }) {
   const [value, setValue] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [activeTags, setActiveTags] = useState([])
   const inputRef = useRef(null)
+  const { t } = useI18n()
+  // System tags (e.g. "External") are assigned by the app, so they aren't offered when adding by hand.
+  const userTags = useMemo(() => allTags.filter((tag) => !tag.system), [allTags])
 
   const handleChange = useCallback((e) => {
     const v = e.target.value
@@ -51,20 +55,14 @@ export function AddBar({ onAdd, getSuggestions, removeFromHistory, pendingNames,
     setActiveTags((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
   }, [])
 
-  const handleCreate = useCallback((name) => {
-    const key = ensureTag(name)
-    if (key) setActiveTags((prev) => (prev.includes(key) ? prev : [...prev, key]))
-  }, [ensureTag])
-
   return (
     <div className={styles.bar}>
       <Autocomplete suggestions={suggestions} onSelect={handleSelect} onDelete={handleDeleteSuggestion} />
       <div className={styles.tagRow}>
         <TagPicker
-          allTags={allTags}
+          allTags={userTags}
           selected={activeTags}
           onToggle={toggleActive}
-          onCreate={handleCreate}
         />
       </div>
       <div className={styles.inputWrapper}>
@@ -77,14 +75,14 @@ export function AddBar({ onAdd, getSuggestions, removeFromHistory, pendingNames,
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          placeholder="Añadir producto..."
+          placeholder={t('addBar.placeholder')}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="sentences"
           spellCheck={false}
           enterKeyHint="done"
         />
-        <button className={styles.addBtn} onClick={submit} aria-label="Añadir">
+        <button className={styles.addBtn} onClick={submit} aria-label={t('addBar.add')}>
           +
         </button>
       </div>

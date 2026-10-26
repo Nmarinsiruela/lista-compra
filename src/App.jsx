@@ -2,86 +2,71 @@ import { useCallback, useEffect, useRef } from 'react'
 import { Header } from './components/Header'
 import { ItemList } from './components/ItemList'
 import { AddBar } from './components/AddBar'
-import { Toast, useToast } from './components/Toast'
+import { Toast } from './components/Toast'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useTags } from './hooks/useTags'
+import { useToast } from './hooks/useToast'
+import { useI18n } from './i18n/I18nContext'
+import { buildShareUrl, consumeSharedNames } from './utils/share'
+import { EXTERNAL_TAG } from './utils/tags'
 import styles from './App.module.css'
 
 export default function App() {
   const { pending, done, pendingNames, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, getSuggestions, removeFromHistory } =
     useShoppingList()
-  const { allTags, ensureTag, getTag } = useTags()
+  const { allTags, getTag } = useTags()
   const { message, visible, showToast } = useToast()
+  const { t } = useI18n()
   const didImport = useRef(false)
 
+  // Products arriving through a shared link get the "external" tag so they can be told apart.
   useEffect(() => {
     if (didImport.current) return
     didImport.current = true
 
-    const params = new URLSearchParams(window.location.search)
-    const raw = params.get('share')
-    if (!raw) return
+    const names = consumeSharedNames()
+    if (!names.length) return
 
-    try {
-      const names = JSON.parse(raw)
-      if (Array.isArray(names) && names.length > 0) {
-        const result = importItems(names)
-        if (result.added > 0) {
-          showToast(`${result.added} producto${result.added !== 1 ? 's' : ''} importado${result.added !== 1 ? 's' : ''}`)
-        } else {
-          showToast('Todos los productos ya están en tu lista')
-        }
-      }
-    } catch {}
-
-    const clean = new URL(window.location.href)
-    clean.searchParams.delete('share')
-    window.history.replaceState({}, '', clean)
-  }, [importItems, showToast])
+    const { added } = importItems(names, [EXTERNAL_TAG])
+    showToast(added > 0 ? t('toast.imported', { count: added }) : t('toast.allAlreadyInList'))
+  }, [importItems, showToast, t])
 
   const handleAdd = useCallback(
     (name, tags) => {
       const result = addItem(name, tags)
-      if (result.message) showToast(result.message)
+      if (result.status === 'added') showToast(t('toast.added', { name: result.name }))
+      else if (result.status === 'duplicate') showToast(t('toast.alreadyInList', { name: result.name }))
     },
-    [addItem, showToast],
+    [addItem, showToast, t],
   )
 
   const handleEmptyCart = useCallback(() => {
-    const result = emptyCart()
-    if (result.count === 0) {
-      showToast('El carro ya está vacío')
-    } else {
-      showToast(`${result.count} producto${result.count > 1 ? 's' : ''} devuelto${result.count > 1 ? 's' : ''} a la lista`)
-    }
-  }, [emptyCart, showToast])
+    const { count } = emptyCart()
+    showToast(count === 0 ? t('toast.cartAlreadyEmpty') : t('toast.returnedToList', { count }))
+  }, [emptyCart, showToast, t])
 
   const handleClearAll = useCallback(() => {
-    const result = clearAll()
-    if (result.count === 0) {
-      showToast('La lista ya está vacía')
-    } else {
-      showToast(`Lista borrada (${result.count} producto${result.count > 1 ? 's' : ''})`)
-    }
-  }, [clearAll, showToast])
+    const { count } = clearAll()
+    showToast(count === 0 ? t('toast.listAlreadyEmpty') : t('toast.listCleared', { count }))
+  }, [clearAll, showToast, t])
 
   const handleShare = useCallback(() => {
     if (!pending.length) {
-      showToast('No hay productos pendientes')
+      showToast(t('toast.nothingToShare'))
       return
     }
-    const url = new URL(window.location.href)
-    url.searchParams.set('share', JSON.stringify(pending.map((i) => i.name)))
-    const shareUrl = url.toString()
+    const shareUrl = buildShareUrl(pendingNames)
 
     if (navigator.share) {
-      navigator.share({ title: 'Lista de la compra', url: shareUrl })
+      // Rejects when the user dismisses the share sheet; nothing to do then.
+      navigator.share({ title: t('share.title'), url: shareUrl }).catch(() => {})
     } else {
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        showToast(`Enlace copiado (${pending.length} producto${pending.length !== 1 ? 's' : ''})`)
-      })
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => showToast(t('toast.linkCopied', { count: pending.length })))
+        .catch(() => {})
     }
-  }, [pending, showToast])
+  }, [pending, pendingNames, showToast, t])
 
   return (
     <>
@@ -102,7 +87,6 @@ export default function App() {
           allTags={allTags}
           getTag={getTag}
           onToggleItemTag={toggleItemTag}
-          ensureTag={ensureTag}
         />
       </main>
 
@@ -112,7 +96,6 @@ export default function App() {
         removeFromHistory={removeFromHistory}
         pendingNames={pendingNames}
         allTags={allTags}
-        ensureTag={ensureTag}
       />
 
       <Toast message={message} visible={visible} />

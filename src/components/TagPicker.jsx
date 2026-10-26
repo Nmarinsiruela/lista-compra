@@ -1,34 +1,9 @@
-import { useState, useRef, useCallback } from 'react'
+import { SystemTagIcon } from './TagBadge'
 import styles from './TagPicker.module.css'
 
-export function TagPicker({ allTags, selected, onToggle, onCreate }) {
-  const [creating, setCreating] = useState(false)
-  const [value, setValue] = useState('')
-  const inputRef = useRef(null)
+// Multi-select over a fixed list of tags: each chip toggles on and off.
+export function TagPicker({ allTags, selected, onToggle }) {
   const selectedSet = new Set(selected)
-
-  const startCreating = useCallback(() => {
-    setCreating(true)
-    requestAnimationFrame(() => inputRef.current?.focus())
-  }, [])
-
-  const commit = useCallback(() => {
-    const name = value.trim()
-    if (name) onCreate(name)
-    setValue('')
-    setCreating(false)
-  }, [value, onCreate])
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === 'Enter') commit()
-      else if (e.key === 'Escape') {
-        setValue('')
-        setCreating(false)
-      }
-    },
-    [commit],
-  )
 
   return (
     <div className={styles.picker}>
@@ -44,35 +19,11 @@ export function TagPicker({ allTags, selected, onToggle, onCreate }) {
             onClick={() => onToggle(tag.key)}
             aria-pressed={isOn}
           >
+            {tag.system && <SystemTagIcon />}
             {tag.name}
           </button>
         )
       })}
-
-      {creating ? (
-        <input
-          ref={inputRef}
-          className={styles.input}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={commit}
-          placeholder="Nueva etiqueta…"
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          maxLength={20}
-        />
-      ) : (
-        <button
-          type="button"
-          className={styles.addChip}
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={startCreating}
-        >
-          + Etiqueta
-        </button>
-      )}
     </div>
   )
 }

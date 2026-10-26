@@ -1,9 +1,20 @@
 import styles from './TagBadge.module.css'
 
+// Chain-link glyph marking tags the app assigns itself (e.g. items that came from a shared link).
+export function SystemTagIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  )
+}
+
 export function TagBadge({ tag }) {
   if (!tag) return null
   return (
     <span className={styles.badge} style={{ '--tag-color': tag.color }}>
+      {tag.system && <SystemTagIcon />}
       {tag.name}
     </span>
   )

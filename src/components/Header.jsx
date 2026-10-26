@@ -1,3 +1,6 @@
+import { useI18n } from '../i18n/I18nContext'
+import { LanguageSwitch } from './LanguageSwitch'
+import { ThemeToggle } from './ThemeToggle'
 import styles from './Header.module.css'
 
 function ShareIcon() {
@@ -13,28 +16,31 @@ function ShareIcon() {
 }
 
 export function Header({ pending, done, onClearAll, onEmptyCart, onShare }) {
+  const { t } = useI18n()
   const total = pending.length + done.length
   const statsText = total === 0
-    ? 'Lista vacía'
-    : `${done.length} de ${total} recogido${total !== 1 ? 's' : ''}`
+    ? t('header.statsEmpty')
+    : t('header.stats', { done: done.length, count: total })
 
   return (
     <header className={styles.header}>
       <div className={styles.top}>
-        <div>
-          <h1 className={styles.title}>🛒 Lista</h1>
-          <p className={styles.stats}>{statsText}</p>
-        </div>
+        <h1 className={styles.title}>{t('header.title')}</h1>
         <div className={styles.headerActions}>
           <button className={styles.clearAllBtn} onClick={onEmptyCart}>
-            Vaciar carro
+            {t('header.emptyCart')}
           </button>
           <button className={styles.clearAllBtn} onClick={onClearAll}>
-            Limpiar todo
+            {t('header.clearAll')}
           </button>
-          <button className={styles.shareBtn} onClick={onShare} aria-label="Compartir carro">
+          <button className={styles.shareBtn} onClick={onShare} aria-label={t('header.share')}>
             <ShareIcon />
           </button>
+        </div>
+        <p className={styles.stats}>{statsText}</p>
+        <div className={styles.settings}>
+          <ThemeToggle />
+          <LanguageSwitch />
         </div>
       </div>
     </header>

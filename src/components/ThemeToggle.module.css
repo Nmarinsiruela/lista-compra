@@ -1,0 +1,22 @@
+/* Same height and chrome as the language switch it sits next to. */
+.toggle {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  transition: background 0.15s;
+}
+
+.toggle:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}

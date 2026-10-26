@@ -1,5 +1,5 @@
 .header {
-  background: var(--green);
+  background: var(--bar);
   color: white;
   padding: 16px 16px 12px;
   position: sticky;
@@ -8,46 +8,38 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Two rows: title + actions on top, stats + theme/language settings underneath. */
 .top {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  column-gap: 8px;
+  row-gap: 4px;
 }
 
 .title {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .stats {
   font-size: 0.8rem;
   opacity: 0.85;
   font-weight: 500;
-  margin-top: 2px;
+}
+
+.settings {
+  justify-self: end;
+  display: flex;
+  gap: 6px;
 }
 
 .headerActions {
   display: flex;
   gap: 6px;
   flex-shrink: 0;
-}
-
-.clearBtn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-
-.clearBtn:active {
-  background: rgba(255, 255, 255, 0.35);
 }
 
 .clearAllBtn {

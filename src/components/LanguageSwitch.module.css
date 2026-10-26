@@ -1,0 +1,32 @@
+.switch {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.option {
+  min-width: 26px;
+  height: 22px;
+  padding: 0 5px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, color 0.15s;
+}
+
+.option.active {
+  background: var(--on-bar);
+  color: var(--bar-ink);
+}
+
+.option:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
