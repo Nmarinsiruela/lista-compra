@@ -1,0 +1,112 @@
+/* Scrolls sideways edge to edge of the header, keeping the header's 16px gutter. */
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px -16px 0;
+  padding: 0 16px;
+  overflow-x: auto;
+  scroll-padding-inline: 16px;
+  scrollbar-width: none;
+  /* Fade tabs out into the gutters so it's clear the row scrolls. */
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.tab,
+.addBtn,
+.deleteBtn {
+  flex-shrink: 0;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab:active,
+.addBtn:active,
+.deleteBtn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.tab:focus-visible,
+.addBtn:focus-visible,
+.deleteBtn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
+
+.tab {
+  gap: 6px;
+  max-width: 190px;
+  padding: 0 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tab.active {
+  background: var(--on-bar);
+  border-color: var(--on-bar);
+  color: var(--bar-ink);
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+/* Dashed like a slot waiting to be filled: it creates rather than selects. */
+.addBtn {
+  width: 30px;
+  border-style: dashed;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.editor {
+  flex-shrink: 0;
+  display: inline-flex;
+  gap: 4px;
+}
+
+/* Outlined rather than filled, so it reads as a text field and not as the active tab. */
+.input {
+  flex-shrink: 0;
+  height: 30px;
+  width: 160px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--on-bar);
+  background: rgba(0, 0, 0, 0.18);
+  color: white;
+  caret-color: white;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.deleteBtn {
+  width: 30px;
+}

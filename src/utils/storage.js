@@ -1,5 +1,7 @@
 export const STORAGE_KEYS = {
   list: 'compra_lista',
+  lists: 'compra_listas',
+  activeList: 'compra_lista_activa',
   history: 'compra_historial',
   language: 'compra_idioma',
   // Also read by the inline script in index.html.

@@ -14,8 +14,8 @@ describe('createTranslator', () => {
 
   it('picks the plural form from the count', () => {
     const t = createTranslator('es')
-    expect(t('toast.imported', { count: 1 })).toBe('1 producto importado')
-    expect(t('toast.imported', { count: 3 })).toBe('3 productos importados')
+    expect(t('toast.imported', { count: 1, list: 'Fiesta' })).toBe('1 producto importado en "Fiesta"')
+    expect(t('toast.imported', { count: 3, list: 'Fiesta' })).toBe('3 productos importados en "Fiesta"')
   })
 
   it('falls back to the key when it is missing everywhere', () => {

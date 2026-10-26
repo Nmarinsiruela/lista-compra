@@ -146,7 +146,7 @@ describe('useShoppingList', () => {
     })
 
     expect(res.count).toBe(2)
-    expect(result.current.list).toHaveLength(0)
+    expect(result.current.items).toHaveLength(0)
   })
 
   it('imports new names while skipping ones already present', () => {
@@ -224,5 +224,108 @@ describe('useShoppingList', () => {
     const stored = JSON.parse(localStorage.getItem('compra_lista'))
     expect(stored).toHaveLength(1)
     expect(stored[0]).toMatchObject({ name: 'Leche', tags: ['family'] })
+  })
+
+  it('puts items saved before lists existed into the default list', () => {
+    localStorage.setItem(
+      'compra_lista',
+      JSON.stringify([{ id: 'x1', name: 'Leche', done: false, addedAt: 1, tags: [] }]),
+    )
+
+    const { result } = renderHook(() => useShoppingList())
+
+    expect(result.current.pending[0].listId).toBe('default')
+  })
+})
+
+describe('useShoppingList with several lists', () => {
+  const render = () =>
+    renderHook(({ listId }) => useShoppingList(listId), { initialProps: { listId: 'party' } })
+
+  it('only shows and counts the items of the open list', () => {
+    const { result, rerender } = render()
+    act(() => {
+      result.current.addItem('Globos')
+    })
+
+    rerender({ listId: 'work' })
+    expect(result.current.pending).toEqual([])
+
+    act(() => {
+      result.current.addItem('Grapas')
+    })
+    act(() => {
+      result.current.toggleItem(result.current.pending[0].id)
+    })
+
+    expect(result.current.counts).toEqual({
+      party: { pending: 1, total: 1 },
+      work: { pending: 0, total: 1 },
+    })
+  })
+
+  it('allows the same product in two lists', () => {
+    const { result, rerender } = render()
+    act(() => {
+      result.current.addItem('Leche')
+    })
+    rerender({ listId: 'work' })
+
+    let res
+    act(() => {
+      res = result.current.addItem('Leche')
+    })
+
+    expect(res.status).toBe('added')
+    expect(result.current.items).toHaveLength(2)
+  })
+
+  it('scopes clear-all and empty-cart to the open list', () => {
+    const { result, rerender } = render()
+    act(() => {
+      result.current.addItem('Globos')
+    })
+    rerender({ listId: 'work' })
+    act(() => {
+      result.current.addItem('Grapas')
+    })
+
+    act(() => {
+      result.current.clearAll()
+    })
+
+    expect(result.current.items.map((i) => i.name)).toEqual(['Globos'])
+  })
+
+  it('imports into a given list, de-duplicating only against that list', () => {
+    const { result } = render()
+    act(() => {
+      result.current.addItem('Leche')
+    })
+
+    let res
+    act(() => {
+      res = result.current.importItems(['Leche', 'Pan'], ['external'], 'shared')
+    })
+
+    expect(res.added).toBe(2)
+    expect(result.current.counts.shared).toEqual({ pending: 2, total: 2 })
+  })
+
+  it('removes every item of a deleted list', () => {
+    const { result, rerender } = render()
+    act(() => {
+      result.current.addItem('Globos')
+    })
+    rerender({ listId: 'work' })
+    act(() => {
+      result.current.addItem('Grapas')
+    })
+
+    act(() => {
+      result.current.removeListItems('party')
+    })
+
+    expect(result.current.items.map((i) => i.name)).toEqual(['Grapas'])
   })
 })

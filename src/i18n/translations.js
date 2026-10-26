@@ -18,6 +18,18 @@ const es = {
   'theme.toLight': 'Cambiar a modo claro',
   'theme.toDark': 'Cambiar a modo oscuro',
 
+  'lists.label': 'Listas',
+  'lists.defaultTitle': 'Compra',
+  'lists.new': 'Nueva lista',
+  'lists.rename': 'Renombrar lista',
+  'lists.editHint': 'Toca para renombrar o borrar',
+  'lists.namePlaceholder': 'Nombre de la lista',
+  'lists.delete': 'Borrar lista',
+  'lists.confirmDelete': {
+    one: '¿Borrar "{title}" y su producto?',
+    other: '¿Borrar "{title}" y sus {count} productos?',
+  },
+
   'list.emptyTitle': 'Tu lista está vacía',
   'list.emptyHint': 'Empieza añadiendo productos abajo',
   'list.pending': 'Por comprar ({count})',
@@ -41,7 +53,12 @@ const es = {
 
   'toast.added': '"{name}" añadido',
   'toast.alreadyInList': '"{name}" ya está en la lista',
-  'toast.imported': { one: '{count} producto importado', other: '{count} productos importados' },
+  'toast.imported': {
+    one: '{count} producto importado en "{list}"',
+    other: '{count} productos importados en "{list}"',
+  },
+  'toast.listExists': 'Ya existe una lista "{title}"',
+  'toast.listDeleted': 'Lista "{title}" borrada',
   'toast.allAlreadyInList': 'Todos los productos ya están en tu lista',
   'toast.cartAlreadyEmpty': 'El carro ya está vacío',
   'toast.returnedToList': {
@@ -52,8 +69,6 @@ const es = {
   'toast.listCleared': { one: 'Lista borrada ({count} producto)', other: 'Lista borrada ({count} productos)' },
   'toast.nothingToShare': 'No hay productos pendientes',
   'toast.linkCopied': { one: 'Enlace copiado ({count} producto)', other: 'Enlace copiado ({count} productos)' },
-
-  'share.title': 'Lista de la compra',
 }
 
 const en = {
@@ -72,6 +87,18 @@ const en = {
 
   'theme.toLight': 'Switch to light mode',
   'theme.toDark': 'Switch to dark mode',
+
+  'lists.label': 'Lists',
+  'lists.defaultTitle': 'Groceries',
+  'lists.new': 'New list',
+  'lists.rename': 'Rename list',
+  'lists.editHint': 'Tap to rename or delete',
+  'lists.namePlaceholder': 'List name',
+  'lists.delete': 'Delete list',
+  'lists.confirmDelete': {
+    one: 'Delete "{title}" and its product?',
+    other: 'Delete "{title}" and its {count} products?',
+  },
 
   'list.emptyTitle': 'Your list is empty',
   'list.emptyHint': 'Start by adding products below',
@@ -96,7 +123,12 @@ const en = {
 
   'toast.added': '"{name}" added',
   'toast.alreadyInList': '"{name}" is already on the list',
-  'toast.imported': { one: '{count} product imported', other: '{count} products imported' },
+  'toast.imported': {
+    one: '{count} product imported into "{list}"',
+    other: '{count} products imported into "{list}"',
+  },
+  'toast.listExists': 'A list called "{title}" already exists',
+  'toast.listDeleted': 'List "{title}" deleted',
   'toast.allAlreadyInList': 'All products are already on your list',
   'toast.cartAlreadyEmpty': 'The cart is already empty',
   'toast.returnedToList': {
@@ -107,8 +139,6 @@ const en = {
   'toast.listCleared': { one: 'List cleared ({count} product)', other: 'List cleared ({count} products)' },
   'toast.nothingToShare': 'No pending products',
   'toast.linkCopied': { one: 'Link copied ({count} product)', other: 'Link copied ({count} products)' },
-
-  'share.title': 'Shopping list',
 }
 
 export const translations = { es, en }

@@ -5,10 +5,11 @@ Webapp mobile-first para gestionar la lista de la compra, con historial intelige
 ## Características
 
 - Añadir, marcar y eliminar productos
+- Varias listas con título único (p. ej. "Material de oficina", "Fiesta"); toca la pestaña activa para renombrarla o borrarla
 - Etiquetas por producto para separar la compra: *Yo*, *Familia*, *Amigos*, *Otros* (un producto puede tener varias)
 - Autocompletado basado en historial personal (ordenado por frecuencia)
 - Persistencia en `localStorage` — funciona sin conexión
-- Compartir la lista mediante enlace; los productos importados reciben la etiqueta *Externo*
+- Compartir una lista mediante enlace; se importa en la lista con el mismo título (creándola si no existe) y los productos reciben la etiqueta *Externo*
 - Interfaz en español e inglés (selector ES/EN en la cabecera)
 - Modo oscuro por defecto, con opción de modo claro
 - Diseño mobile-first
@@ -18,7 +19,7 @@ Webapp mobile-first para gestionar la lista de la compra, con historial intelige
 ```
 src/
   components/   Componentes de UI (+ CSS modules)
-  hooks/        Estado: lista, historial, etiquetas, tema, toasts
+  hooks/        Estado: listas, productos, historial, etiquetas, tema, toasts
   i18n/         Traducciones (translations.js) y proveedor de idioma
   utils/        Helpers: texto, localStorage, enlaces compartidos, etiquetas del sistema
 ```

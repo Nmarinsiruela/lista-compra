@@ -15,7 +15,8 @@ function ShareIcon() {
   )
 }
 
-export function Header({ pending, done, onClearAll, onEmptyCart, onShare }) {
+// `children` is rendered as a full-width row under the header controls (the list tabs).
+export function Header({ pending, done, onClearAll, onEmptyCart, onShare, children }) {
   const { t } = useI18n()
   const total = pending.length + done.length
   const statsText = total === 0
@@ -43,6 +44,7 @@ export function Header({ pending, done, onClearAll, onEmptyCart, onShare }) {
           <LanguageSwitch />
         </div>
       </div>
+      {children}
     </header>
   )
 }

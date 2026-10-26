@@ -1,35 +1,50 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { Header } from './components/Header'
+import { ListTabs } from './components/ListTabs'
 import { ItemList } from './components/ItemList'
 import { AddBar } from './components/AddBar'
 import { Toast } from './components/Toast'
+import { useLists } from './hooks/useLists'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useTags } from './hooks/useTags'
 import { useToast } from './hooks/useToast'
 import { useI18n } from './i18n/I18nContext'
-import { buildShareUrl, consumeSharedNames } from './utils/share'
+import { buildShareUrl, consumeSharedList } from './utils/share'
 import { EXTERNAL_TAG } from './utils/tags'
 import styles from './App.module.css'
 
 export default function App() {
-  const { pending, done, pendingNames, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, getSuggestions, removeFromHistory } =
-    useShoppingList()
+  const { lists, activeList, selectList, findByTitle, createList, renameList, deleteList } = useLists()
+  const { pending, done, pendingNames, counts, addItem, toggleItem, toggleItemTag, deleteItem, clearAll, emptyCart, importItems, removeListItems, getSuggestions, removeFromHistory } =
+    useShoppingList(activeList.id)
   const { allTags, getTag } = useTags()
   const { message, visible, showToast } = useToast()
   const { t } = useI18n()
   const didImport = useRef(false)
 
   // Products arriving through a shared link get the "external" tag so they can be told apart.
+  // They go into the list named in the link (created if needed), or the open list for older links.
   useEffect(() => {
     if (didImport.current) return
     didImport.current = true
 
-    const names = consumeSharedNames()
+    const { names, title } = consumeSharedList()
     if (!names.length) return
 
-    const { added } = importItems(names, [EXTERNAL_TAG])
-    showToast(added > 0 ? t('toast.imported', { count: added }) : t('toast.allAlreadyInList'))
-  }, [importItems, showToast, t])
+    let target = activeList
+    if (title) {
+      const existing = findByTitle(title)
+      if (existing) {
+        target = existing
+        selectList(existing.id)
+      } else {
+        target = createList(title).list ?? activeList
+      }
+    }
+
+    const { added } = importItems(names, [EXTERNAL_TAG], target.id)
+    showToast(added > 0 ? t('toast.imported', { count: added, list: target.title }) : t('toast.allAlreadyInList'))
+  }, [activeList, findByTitle, selectList, createList, importItems, showToast, t])
 
   const handleAdd = useCallback(
     (name, tags) => {
@@ -55,18 +70,40 @@ export default function App() {
       showToast(t('toast.nothingToShare'))
       return
     }
-    const shareUrl = buildShareUrl(pendingNames)
+    const shareUrl = buildShareUrl(pendingNames, activeList.title)
 
     if (navigator.share) {
       // Rejects when the user dismisses the share sheet; nothing to do then.
-      navigator.share({ title: t('share.title'), url: shareUrl }).catch(() => {})
+      navigator.share({ title: activeList.title, url: shareUrl }).catch(() => {})
     } else {
       navigator.clipboard
         .writeText(shareUrl)
         .then(() => showToast(t('toast.linkCopied', { count: pending.length })))
         .catch(() => {})
     }
-  }, [pending, pendingNames, showToast, t])
+  }, [pending, pendingNames, activeList, showToast, t])
+
+  // Returns whether the title was accepted, so the tab input knows whether to close.
+  const handleListTitle = useCallback(
+    (result) => {
+      if (result.status === 'duplicate') showToast(t('toast.listExists', { title: result.title }))
+      return result.status === 'created' || result.status === 'renamed'
+    },
+    [showToast, t],
+  )
+
+  const handleDeleteList = useCallback(
+    (id) => {
+      const list = lists.find((l) => l.id === id)
+      const total = counts[id]?.total ?? 0
+      if (!list || (total > 0 && !window.confirm(t('lists.confirmDelete', { title: list.title, count: total })))) return
+
+      if (deleteList(id).status !== 'deleted') return
+      removeListItems(id)
+      showToast(t('toast.listDeleted', { title: list.title }))
+    },
+    [lists, counts, deleteList, removeListItems, showToast, t],
+  )
 
   return (
     <>
@@ -76,7 +113,17 @@ export default function App() {
         onEmptyCart={handleEmptyCart}
         onClearAll={handleClearAll}
         onShare={handleShare}
-      />
+      >
+        <ListTabs
+          lists={lists}
+          activeId={activeList.id}
+          counts={counts}
+          onSelect={selectList}
+          onCreate={(title) => handleListTitle(createList(title))}
+          onRename={(id, title) => handleListTitle(renameList(id, title))}
+          onDelete={handleDeleteList}
+        />
+      </Header>
 
       <main className={styles.main}>
         <ItemList
